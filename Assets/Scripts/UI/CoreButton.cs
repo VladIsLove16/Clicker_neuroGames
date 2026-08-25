@@ -1,16 +1,55 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class Button : MonoBehaviour
+namespace Clicker.UI
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    /// <summary>
+    /// Shared button behaviour with a small device-independent press response.
+    /// </summary>
+    [AddComponentMenu("Clicker/UI/Core Button")]
+    public sealed class CoreButton : Button
     {
-        
-    }
+        [SerializeField, Range(0.85f, 1f)] private float pressedScale = 0.96f;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private Vector3 initialScale;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            initialScale = transform.localScale;
+        }
+
+        public override void OnPointerDown(PointerEventData eventData)
+        {
+            base.OnPointerDown(eventData);
+            if (IsInteractable())
+            {
+                transform.localScale = initialScale * pressedScale;
+            }
+        }
+
+        public override void OnPointerUp(PointerEventData eventData)
+        {
+            base.OnPointerUp(eventData);
+            RestoreScale();
+        }
+
+        public override void OnDeselect(BaseEventData eventData)
+        {
+            base.OnDeselect(eventData);
+            RestoreScale();
+        }
+
+        protected override void OnDisable()
+        {
+            RestoreScale();
+            base.OnDisable();
+        }
+
+        private void RestoreScale()
+        {
+            transform.localScale = initialScale;
+        }
     }
 }
